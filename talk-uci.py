@@ -333,7 +333,7 @@ while True:
                     move = random.choice(moves).move()
 
         if move == None:
-            signal.alarm(search_time * 2 / 1000.0)
+            signal.alarm(search_time * 2 / 1000)
             uc.isready()
             uc.position(board)
             (move, ponder_move) = uc.go(movetime = search_time)
@@ -345,7 +345,7 @@ while True:
         print('%s ' % move, end='', flush=True)
 
     else:
-        signal.alarm(search_time * 2 / 1000.0)
+        signal.alarm(search_time * 2 / 1000)
         if board.turn:
            move = wait_for_white_move(board)
         else:
