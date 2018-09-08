@@ -18,14 +18,17 @@ import tempfile
 import time
 
 debug = False
-uci_program = '/usr/games/stockfish'
+#uci_program = '/usr/games/stockfish'
 #uci_program = '/home/folkert/Projects/QueenBee/tags/v0.9.1_2205/trunk/Embla'
-#uci_program = 'shallow-blue/shallowblue'
+uci_program = 'shallow-blue/shallowblue'
 pgn_file = 'test.pgn'
 msx_max_speed = False
-msx_color = 'W'
+msx_color = None
 search_time = 1000
 polyglot_opening_book = '/usr/share/gnuchess/smallbook.bin'
+
+if msx_color == None:
+    msx_color = random.choice(['W', 'B'])
 
 vram_bin = tempfile.mktemp()
 tcl_script = tempfile.mktemp()
