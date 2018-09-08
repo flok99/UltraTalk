@@ -25,6 +25,7 @@ pgn_file = 'test.pgn'
 msx_max_speed = False
 msx_color = 'W'
 search_time = 1000
+polyglot_opening_book = '/usr/share/gnuchess/smallbook.bin'
 
 vram_bin = tempfile.mktemp()
 tcl_script = tempfile.mktemp()
@@ -302,6 +303,8 @@ game.headers['Date'] = '%04d.%02d.%02d' % (d.year, d.month, d.day)
 
 node = None
 
+import chess.polyglot
+
 while True:
     if board.is_game_over():
         break
@@ -311,9 +314,18 @@ while True:
 
     s = time.time()
     if board.turn != color:
-        uc.isready()
-        uc.position(board)
-        (move, ponder_move) = uc.go(movetime = search_time)
+        move = None
+
+        if polyglot_opening_book != None:
+            with chess.polyglot.open_reader(polyglot_opening_book) as reader:
+                moves = list(reader.find_all(board))
+                if len(moves) > 0:
+                    move = random.choice(moves).move()
+
+        if move == None:
+            uc.isready()
+            uc.position(board)
+            (move, ponder_move) = uc.go(movetime = search_time)
 
         send_move(proc, move, board.turn)
         board.push(move)
