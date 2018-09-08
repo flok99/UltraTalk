@@ -25,7 +25,7 @@ pgn_file = 'test.pgn'
 msx_max_speed = False
 msx_color = None
 search_time = 1000
-polyglot_opening_book = '/usr/share/gnuchess/smallbook.bin'
+polyglot_opening_book = '/usr/share/games/gnuchess/book.bin'
 
 if msx_color == None:
     msx_color = random.choice(['W', 'B'])
@@ -307,6 +307,13 @@ game.headers['Date'] = '%04d.%02d.%02d' % (d.year, d.month, d.day)
 node = None
 
 import chess.polyglot
+import signal
+
+def handler(signum, frame):
+    print('Timeout! One of the programs stalled.')
+    sys.exit(1)
+
+signal.signal(signal.SIGALRM, handler)
 
 while True:
     if board.is_game_over():
@@ -326,9 +333,11 @@ while True:
                     move = random.choice(moves).move()
 
         if move == None:
+            signal.alarm(search_time * 2)
             uc.isready()
             uc.position(board)
             (move, ponder_move) = uc.go(movetime = search_time)
+            signal.alarm(0)
 
         send_move(proc, move, board.turn)
         board.push(move)
@@ -336,10 +345,12 @@ while True:
         print('%s ' % move, end='', flush=True)
 
     else:
+        signal.alarm(search_time * 2)
         if board.turn:
            move = wait_for_white_move(board)
         else:
            move = wait_for_black_move(board)
+        signal.alarm(0)
 
         board.push(move)
 
